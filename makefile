@@ -19,4 +19,7 @@ splash:
 apk:
 	flutter clean && flutter build apk --release
 
+vRelease:
+    git tag ${version} && git push origin ${version}
+
 PHONY: pub locale icons builds watch splash apk
