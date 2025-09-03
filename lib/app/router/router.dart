@@ -11,5 +11,14 @@ final router = GoRouter(
       path: '/',
       pageBuilder: (context, state) => MaterialPage(child: TodoPage()),
     ),
+
+    // deep link example
+    // GoRoute(
+    //   path: '/todo/:id',
+    //   pageBuilder: (context, state) {
+    //     final todoId = state.pathParameters['id']!;
+    //     return MaterialPage(child: TodoDetailPage(todoId: todoId));
+    //   },
+    // ),
   ],
 );
