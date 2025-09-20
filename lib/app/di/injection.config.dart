@@ -13,6 +13,8 @@ import 'package:dio/dio.dart' as _i361;
 import 'package:flutter_init/app/env.dart' as _i528;
 import 'package:flutter_init/core/network/dio_client.dart' as _i982;
 import 'package:flutter_init/core/network/retrofit_client.dart' as _i596;
+import 'package:flutter_init/core/services/connectivity_service.dart' as _i499;
+import 'package:flutter_init/core/services/theme_service.dart' as _i86;
 import 'package:flutter_init/features/todos/data/repositories/todo_repository_impl.dart'
     as _i163;
 import 'package:flutter_init/features/todos/data/sources/todo_api.dart'
@@ -21,8 +23,6 @@ import 'package:flutter_init/features/todos/domain/repositories/todo_repository.
     as _i450;
 import 'package:flutter_init/features/todos/domain/usecases/get_todos.dart'
     as _i344;
-import 'package:flutter_init/features/todos/presentation/view_model/todo_vm.dart'
-    as _i483;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
@@ -35,6 +35,8 @@ extension GetItInjectableX on _i174.GetIt {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final dioModule = _$DioModule();
     final todoApiModule = _$TodoApiModule();
+    gh.singleton<_i499.ConnectivityService>(() => _i499.ConnectivityService());
+    gh.singleton<_i86.ThemeService>(() => _i86.ThemeService());
     gh.lazySingleton<_i361.Dio>(() => dioModule.dio());
     gh.lazySingleton<_i998.TodoApi>(
       () =>
@@ -49,7 +51,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i344.GetTodos>(
       () => _i344.GetTodos(gh<_i450.TodoRepository>()),
     );
-    gh.singleton<_i483.TodoVM>(() => _i483.TodoVM(gh<_i344.GetTodos>()));
     return this;
   }
 }

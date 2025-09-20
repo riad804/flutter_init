@@ -1,6 +1,6 @@
 import 'package:injectable/injectable.dart';
+import 'package:rx_state_manager/rx_state_manager.dart';
 import '../../../../core/either.dart';
-import '../../../../core/failure.dart';
 import '../../domain/entities/todo.dart';
 import '../../domain/repositories/todo_repository.dart';
 import '../sources/todo_api.dart';

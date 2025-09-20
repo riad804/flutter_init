@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_init/core/common/widgets/base_screen.dart';
 import 'package:go_router/go_router.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:rx_state_manager/rx_state_manager.dart';
 
 import '../../../app/router/get_bottom_sheet_routes.dart';
 
@@ -10,24 +10,14 @@ class BaseTabScreen extends BaseScreen {
 
   final Widget child;
 
-  final _indexSubject = BehaviorSubject<int>.seeded(0);
+  final RxVar<int> _indexSubject = RxVar<int>(0);
 
-  @override
-  onInit() {
-    _indexSubject.stream.listen((index) {
-    });
-  }
-
-  @override
-  onDispose() {
-    _indexSubject.close();
-  }
 
 
   @override
-  Widget build(BuildContext context, Object? args) { // todo Object should be an view model
+  Widget buildScreen(BuildContext context, RxController controller) {
     final location = GoRouterState.of(context).uri.toString();
-    _indexSubject.add(navigationModel.navItems.indexWhere((item) => item.route == location));
+    _indexSubject.value = (navigationModel.navItems.indexWhere((item) => item.route == location));
 
     return Scaffold(
       body: child,
@@ -50,7 +40,7 @@ class BaseTabScreen extends BaseScreen {
         },
       ),
     );
-  }
+  }  
 
 }
 

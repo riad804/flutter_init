@@ -1,55 +1,86 @@
-import 'package:flutter/material.dart';
+import 'package:rx_state_manager/rx_state_manager.dart';
 
-import '../../../app/di/injection.dart';
-import '../../rx/rx_view_model.dart';
-
-extension BaseScreenVMX<VM extends RxViewModel> on BaseScreen<VM> {
-  VM get getVM => sl<VM>();
+extension ControllerExtension on BuildContext {
+  T of<T extends RxController>() => BaseScreen.of<T>(this);
 }
 
-T viewModel<T extends RxViewModel>() => sl<T>();
-
-/// BaseScreen: automatically binds a ViewModel and manages lifecycle
-abstract class BaseScreen<VM extends RxViewModel> extends StatefulWidget implements ScreenI<VM> {
+abstract class BaseScreen<T extends RxController> extends ScreenI<T> {
   const BaseScreen({super.key});
 
-  /// Build the screen UI
-  Widget build(BuildContext context, VM vm);
+  /// Build the UI with the controller
+  Widget buildScreen(BuildContext context, T controller);
+
+  /// Access the controller from child widgets
+  static T of<T extends RxController>(BuildContext context) {
+    final _InheritedController<T>? inherited =
+        context.dependOnInheritedWidgetOfExactType<_InheritedController<T>>();
+    if (inherited == null) {
+      throw FlutterError(
+          "No BaseScreen controller of type $T found in context");
+    }
+    return inherited.controller;
+  }
 
   @override
-  State<BaseScreen<VM>> createState() => _BaseScreenState<VM>();
+  State<BaseScreen<T>> createState() => _BaseScreenState<T>();
 }
 
-class _BaseScreenState<VM extends RxViewModel> extends State<BaseScreen<VM>> {
-  late final VM vm;
+class _BaseScreenState<T extends RxController> extends State<BaseScreen<T>> {
+  late final T controller;
 
   @override
   void initState() {
-    vm = sl<VM>();
-    widget.onInit();
     super.initState();
+    if (widget.controller != null) {
+    controller = widget.controller!;
+    }
+    controller.onInit();
+    widget.onInit();
   }
-
 
   @override
   void dispose() {
-    vm.dispose();
+    controller.dispose();
     widget.onDispose();
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return widget.build(context, vm);
+    return _InheritedController<T>(
+      controller: controller,
+      child: widget.buildScreen(context, controller),
+    );
   }
 }
 
-mixin ScreenI<VM extends RxViewModel> on Widget {
+
+abstract class ScreenI<T extends RxController> extends StatefulWidget {
+  const ScreenI({super.key});
 
   @protected
-  onInit() {}
+  T? get controller => null;
 
+  /// Called when the screen is initialized
   @protected
-  onDispose() {}
+  void onInit() {}
+
+  /// Called when the screen is disposed
+  @protected
+  void onDispose() {}
+}
+
+/// InheritedWidget to expose controller
+class _InheritedController<T extends RxController> extends InheritedWidget {
+  final T controller;
+
+  const _InheritedController({
+    super.key,
+    required super.child,
+    required this.controller,
+  });
+
+  @override
+  bool updateShouldNotify(covariant _InheritedController<T> oldWidget) =>
+      oldWidget.controller != controller;
 }

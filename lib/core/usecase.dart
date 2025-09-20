@@ -1,5 +1,6 @@
+import 'package:rx_state_manager/rx_state_manager.dart';
+
 import 'either.dart';
-import 'failure.dart';
 
 
 abstract interface class UseCase<T, P> {
